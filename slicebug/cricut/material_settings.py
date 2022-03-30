@@ -47,8 +47,9 @@ class MaterialSettings:
     @classmethod
     def load(cls, path):
         with open(path) as ms_file:
+            materials_json = json.load(ms_file)["customMaterials"]["materials"]
             materials = {
                 material.global_id: material
-                for material in map(Material.from_json, json.load(ms_file))
+                for material in map(Material.from_json, materials_json)
             }
         return cls(materials=materials)
