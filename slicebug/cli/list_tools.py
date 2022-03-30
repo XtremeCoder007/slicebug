@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 from slicebug.cricut.material_settings import MaterialSettings
+from slicebug.cricut.tools import TOOLS
 
 
 def list_tools_register_args(subparsers):
@@ -24,6 +25,8 @@ def list_tools(args, config):
 
     print(f"Tools for {material.name}:")
 
-    tool_sort_key = lambda tool: tuple(sorted(tool.categories))
-    for tool in sorted(material.tools.values(), key=tool_sort_key):
-        print(f" - [{tool.id_}] {tool.name}")
+    for tool in TOOLS:
+        if tool.cricut_api_name not in material.tools:
+            continue
+
+        print(f" - {tool.name}")

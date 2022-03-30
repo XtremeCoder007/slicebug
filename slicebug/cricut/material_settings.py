@@ -4,14 +4,14 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Tool:
+class MaterialToolInfo:
     id_: str
     name: str
     categories: list[str]
 
     @classmethod
     def from_json(cls, data):
-        return Tool(
+        return cls(
             id_=data["name"],
             name=data["displayName"],
             categories=data["toolType"],
@@ -24,12 +24,15 @@ class Material:
     id_: str
     name: str
     category: str
-    tools: dict[str, Tool]
+    tools: dict[str, MaterialToolInfo]
 
     @classmethod
     def from_json(cls, data):
         machine_data = data["machineMaterials"][0]
-        tools = {tool.id_: tool for tool in map(Tool.from_json, machine_data["tools"])}
+        tools = {
+            tool.id_: tool
+            for tool in map(MaterialToolInfo.from_json, machine_data["tools"])
+        }
 
         return Material(
             global_id=data["globalId"],
