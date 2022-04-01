@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+enum PBToolType {
+  NONE_TT = 0;
+  ROLLING_BLADE_TT = 1;
+  DRAG_KNIFE_TT = 2;
+  TANGENTIAL_BLADE_TT = 3;
+  PEN_DT_TT = 4;
+  STYLUS_TT = 5;
+  SCORING_WHEEL_TT = 6;
+  PERFORATION_WHEEL_TT = 9;
+  DEBOSSING_TOOL_TT = 10;
+  WAVE_TOOL_TT = 11;
+  ENGRAVE_TOOL_TT = 12;
+  MIDAS_FINE_TOOL_TT = 13;
+  MIDAS_REGULAR_TOOL_TT = 14;
+  MIDAS_BOLD_TOOL_TT = 15;
+  DOUBLE_SCORING_WHEEL_TT = 98;
+  DEEP_CUT_TT = 99;
+}
+
+enum PBArtType {
+  NONE_ART_TYPE = 0;
+  CUT_ART_TYPE = 1;
+  DRAW_ART_TYPE = 2;
+  SCORE_ART_TYPE = 4;
+  DEBOSS_ART_TYPE = 5;
+  WAVE_ART_TYPE = 6;
+  ENGRAVE_ART_TYPE = 7;
+  PERFORATE_ART_TYPE = 8;
+  MIDAS_FINE_ART_TYPE = 10;
+  MIDAS_REGULAR_ART_TYPE = 11;
+  MIDAS_BOLD_ART_TYPE = 12;
+}
+
+message PBKeyValue {
+  string key = 1;
+  string value = 2;
+}
+
+message PBModeApi {
+  int32 adjustedPressure = 1;
+  repeated int32 deltaAdjustment = 2;
+  int32 closestDialPressure = 3;
+  int32 selectPressure = 4;
+  int32 machinePressure = 5;
+  float cutSpeed = 6;
+  float cutAccel = 7;
+  float moveToSpeed = 8;
+  float moveToAccel = 9;
+  int32 minPressure = 10;
+  int32 maxPressure = 11;
+  int32 pressure = 12;
+  int32 multiPass = 13;
+  repeated int32 multiPressure = 14;
+  string id = 15;
+  repeated PBKeyValue additionalProperties = 16;
+  int32 originalPressure = 17;
+  float zSpeed = 18;
+  float zAccel = 19;
+  float posMM = 20;
+  float yCutSpeed = 21;
+  float yCutAccel = 22;
+  float yMoveToSpeed = 23;
+  float yMoveToAccel = 24;
+}
+
+message PBToolSettings {
+  int32 flags = 1;
+  double lOffset = 2;
+  double liftThresh = 3;
+  int32 pOffset = 4;
+  string pressureBias = 5;
+}
+
+message PBTool {
+  string displayName = 1;
+  string name = 2;
+  PBModeApi precisionMode = 3;
+  PBModeApi draftMode = 4;
+  bool isPreferred = 5;
+  bool isSelected = 6;
+  string id = 7;
+  repeated string toolType = 8;
+  int32 preferredOrder = 9;
+  repeated int32 deltaSettings = 10;
+  int32 maxRangePressure = 11;
+  int32 minRangePressure = 12;
+  repeated PBKeyValue additionalProperties = 13;
+  PBToolSettings settings = 14;
+  bool useMachine = 15;
+  bool useDraftMode = 16;
+  PBToolType toolTypeEnum = 17;
+  PBModeApi matlessMode = 18;
+  PBModeApi cardMatMode = 19;
+}
+
+message PBAnalyticMachineSummary {
+  string firmwareValuesStored = 2;
+  bool primaryUserSet = 6;
+}
+
+message PBSize {
+  double height = 1;
+  double width = 2;
+}
+
+message PBUserSettings {
+  string settings8 = 10;
+}
+
+enum PBMachineType {
+  NOT_IMPORTANT_MT = 0;
+  V1_MT = 1;
+  EXPRESSION_MT = 2;
+  CREATE_MT = 3;
+  EXPRESSION2_MT = 4;
+  MINI_MT = 5;
+  ZORRO_MT = 7;
+  HELIUM_MT = 8;
+  WARRO_MT = 9;
+  HELIUM2_MT = 10;
+  ATHENA_MT = 11;
+  CUPID_MT = 12;
+  MORPHEUS_MT = 13;
+  SCAMANDER_MT = 14;
+  VOLDEMORT_MT = 15;
+  ZEUS_MT = 16;
+  KRONOS_MT = 17;
+  SMARTIES_MT = -98;
+  BLUETOOTH_MODULE_MT = -99;
+  CART_ADAPTER_MT = -100;
+  EZP_APP_MODE_MT = -101;
+  EZP_EP6_120_MT = -102;
+  EZP_EP9_120_MT = -103;
+  EZP_EP12_120_MT = -104;
+  EZP_EP6_230_MT = -105;
+  EZP_EP9_230_MT = -106;
+  EZP_EP12_230_MT = -107;
+  ROOT_BEER_MT = -108;
+  VULCAN_MT = -109;
+  ROOT_BEER_230_MT = -114;
+  ROOT_BEER_APP_MT = -110;
+  VULCAN_APP_MT = -111;
+  ROOT_BEER_APP_230_MT = -112;
+  ATMOSPHERE12_230_MT = -119;
+  ATMOSPHERE9_230_MT = -118;
+  ATMOSPHERE12_110_MT = -117;
+  ATMOSPHERE9_110_MT = -116;
+  BROOKLYN_230_MT = -121;
+  BROOKLYN_110_MT = -120;
+}
+
+enum PBHeadType {
+  CLAMP_A_HT = 0;
+  CLAMP_B_HT = 1;
+  UNKNOWN_HT = 2;
+}

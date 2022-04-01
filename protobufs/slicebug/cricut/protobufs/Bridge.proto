@@ -1,0 +1,141 @@
+syntax = "proto3";
+import "slicebug/cricut/protobufs/NativeModel.proto";
+
+enum PBInteractionStatus {
+  riError = 0;
+  riComplete = 1;
+  riStartSuccess = 2;
+  riCloseInteraction = 3;
+  riPing = 4;
+  riPingReply = 5;
+  riCloseInteractionSuccess = 6;
+  riNoDeviceConnected = 101;
+  riMultipleDevicesConnected = 102;
+  riSingleDeviceConnected = 103;
+  riOpeningDevice = 104;
+  riDeviceOpenSuccess = 105;
+  riDeviceOpenFail = 106;
+  riDeviceCloseSuccess = 107;
+  riDeviceCloseFail = 108;
+  riSelectDevice = 109;
+  riWaitOnMatLoad = 110;
+  riMatLoaded = 111;
+  riMatUnloaded = 112;
+  riWaitOnMatUnload = 113;
+  riDialChanged = 114;
+  riWaitOnGo = 115;
+  riWaitOnGoOrPause = 116;
+  riGoPressed = 117;
+  riPausePressed = 118;
+  riDevicePaused = 122;
+  riDeviceResumed = 123;
+  riWaitClear = 124;
+  riNeedRestartInteractionConfirmation = 129;
+  riSetRestartInteractionConfirmation = 130;
+  riWaitingOnMaterialSelected = 133;
+  riMaterialSelected = 134;
+  riSendToolArray = 135;
+  riToolInfoReceived = 136;
+  riDetectingTool = 137;
+  riMATCUT = 700;
+  riMATCUTNeedPathData = 701;
+  riMATCUTSetPathData = 703;
+  riMATCUTProcessingPathData = 704;
+  riMATCUTProcessingPathDataComplete = 705;
+  riMATCUTNeedAccessoryChange = 706;
+  riMATCUTAccessoryChanged = 707;
+  riMATCUTSetProgress = 710;
+  riMATCUTReportTool = 715;
+  riMATCUTReportToolAck = 716;
+  riMATCUTAbortCut = 717;
+  riMATCUTPresentCarriage = 718;
+  riMATCUTSimulateLoadButtonPressed = 719;
+  riMATCUTSimulateCricutButtonPressed = 720;
+  riMATCUTSimulatePauseButtonPressed = 721;
+  riMATCUTSetExecutionPlan = 722;
+  riMATCUTGetExecutionPlan = 723;
+  riMATCUTUseV1 = 724;
+  riMATCUTUseV2 = 725;
+  riMATCUTGettingDevicePressureSettings = 726;
+  riMATCUTCompleteSuccess = 727;
+  riMATCUTThetaBacklashProgress = 728;
+  riOPENDEVICEGetAnalyticMachineSummary = 1207;
+  riOPENDEVICESetAnalyticMachineSummary = 1208;
+}
+
+message PBInteractionHandle {
+  PBInteractionStatus currentInteraction = 4;
+}
+
+enum PBConnectionType {
+  UNKNOWN_CT = 0;
+  BLUETOOTH_CT = 1;
+  USB_CT = 2;
+  HID_CT = 3;
+  BLE_CT = 4;
+}
+
+message PBCricutDeviceSerialized {
+  string deviceType = 5;
+  int32 port = 8;
+  PBConnectionType connectionType = 21;
+  PBMachineType deviceTypeEnum = 25;
+  string key = 27;
+  bool supportsFastMode = 43;
+  string serial = 10;
+}
+
+message PBToolInfo {
+  PBToolType tool = 1;
+  PBArtType line = 2;
+  PBTool toolFromApi = 4;
+}
+
+message PBBridgeSelectedTools {
+  string firstPen = 1;
+  repeated PBToolInfo tools = 4;
+}
+
+message PBMatPathData {
+  int32 fiducialId = 1;
+  string pathData = 2;
+  PBArtType actualPathType = 14;
+  string pathColor = 4;
+  repeated uint32 contourActiveFlags = 21;
+
+  repeated PBMatPathData imageData = 10;
+  PBSize materialSize = 11;
+}
+
+message PBMaterialSelected {
+  bool selected = 1;
+  double matHeight = 2;
+  double matWidth = 12;
+}
+
+message PBCommonBridge {
+  PBInteractionHandle handle = 2;
+  PBInteractionStatus interaction = 3;
+  PBInteractionStatus status = 6;
+  PBCricutDeviceSerialized device = 9;
+  PBBridgeSelectedTools toolInfo = 14;
+  PBUserSettings authData = 17;
+  PBMatPathData matPathData = 22;
+  PBAnalyticMachineSummary deviceAnalyticMachineSummary = 79;
+  PBMaterialSelected materialSelectedPayload = 111;
+  PBAccessoryV2 accessoryV2 = 127;
+}
+
+message PBAccessoryV2 {
+  message PBAccessoryState {
+    PBToolType toolType = 1;
+    PBArtType pathType = 2;
+    string color = 3;
+    PBHeadType headType = 4;
+  }
+
+  PBAccessoryState current = 1;
+  PBAccessoryState required = 2;
+  bool requiresToolChange = 3;
+  bool requiresPartialUnload = 4;
+}

@@ -1,3 +1,5 @@
+import os.path
+
 from dataclasses import dataclass
 from typing import Optional
 
@@ -7,6 +9,7 @@ from slicebug.config.machine_profile import MachineProfiles, MachineProfile
 
 @dataclass
 class Config:
+    config_root: str
     keys: Optional[Keys]
     profiles: Optional[MachineProfiles]
     profile_name: Optional[str]
@@ -41,8 +44,19 @@ class Config:
             raise ValueError(f"profile {profile_name} does not exist")
 
         return cls(
+            config_root=config_root,
             keys=keys,
             profiles=profiles,
             profile_name=profile_name,
             profile=profile,
         )
+
+    def device_plugin_path(self):
+        path = os.path.join(
+            self.config_root, "plugins", "device-common", "CricutDevice.exe"
+        )
+
+        if not os.path.exists(path):
+            return None
+
+        return path

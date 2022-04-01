@@ -151,3 +151,4 @@ TOOLS = [
 ]
 
 TOOLS_BY_NAME = {tool.name: tool for tool in TOOLS}
+TOOLS_BY_PB_TOOL_TYPE = {tool.cricut_pb_tool_type: tool for tool in TOOLS}
