@@ -107,7 +107,7 @@ def cut_inner(config, dev, plan):
 
     dev.send(
         PBCommonBridge(
-            handle=PBInteractionHandle(currentInteraction=999),  # TODO: is this needed?
+            handle=PBInteractionHandle(currentInteraction=999),
             status=PBInteractionStatus.riSelectDevice,
             device=device_connected_resp.device,
         )
