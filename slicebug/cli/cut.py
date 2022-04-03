@@ -206,19 +206,23 @@ def cut_inner(config, dev, plan):
     dev.recv(PBInteractionStatus.riMATCUTProcessingPathData)
     dev.recv(PBInteractionStatus.riMATCUTProcessingPathDataComplete)
 
-    # TODO: wrong tool
     while (resp := dev.recv()).status != PBInteractionStatus.riMATCUTCompleteSuccess:
-        # this will spam a bunch of riMATCUTGettingDevicePressureSettings for some reason,
-        # then riMATCUTAccessoryChanged, riDetectingTool, riMATCUTSetProgress, riWaitForEndMoveProgress alternated
         match resp.status:
             case PBInteractionStatus.riMATCUTNeedAccessoryChange:
-                current_tool = TOOLS_BY_PB_TOOL_TYPE[resp.accessoryV2.current.toolType]
-                required_tool = TOOLS_BY_PB_TOOL_TYPE[
-                    resp.accessoryV2.required.toolType
-                ]
-                print(
-                    f"Replace the {current_tool.name} with {required_tool.name} and press Go."
-                )
+                tool_names = []
+                for tool in [resp.accessoryV2.current, resp.accessoryV2.required]:
+                    tool_type = TOOLS_BY_PB_TOOL_TYPE[tool.toolType]
+                    tool_name = tool_type.name
+                    if tool_type.name == "pen":
+                        tool_name = f"{tool_type.name} ({tool.color})"
+                    tool_names.append(tool_name)
+
+                current, required = tool_names
+                print(f"Replace the {current} with {required} and press Go.")
+
+                dev.recv(PBInteractionStatus.riWaitOnGo)
+                dev.recv(PBInteractionStatus.riGoPressed)
+                dev.recv(PBInteractionStatus.riWaitClear)
             case PBInteractionStatus.riDevicePaused:
                 dev.recv(PBInteractionStatus.riWaitOnGoOrPause)
                 print("Cutting paused. Press Go to resume or Load/Unload to abort cut.")
@@ -233,6 +237,32 @@ def cut_inner(config, dev, plan):
                     dev.recv(PBInteractionStatus.riDeviceResumed)
                 else:
                     raise ValueError(f"unexpected status {choice.status}")
+            case PBInteractionStatus.riMATCUTReportTool:
+                current_tool = TOOLS_BY_PB_TOOL_TYPE[resp.accessoryV2.current.toolType]
+                required_tool = TOOLS_BY_PB_TOOL_TYPE[
+                    resp.accessoryV2.required.toolType
+                ]
+                # TODO: error
+                # TODO: actually implement this properly. The difficulty is
+                # that the plugin follows this with riSendToolArray and
+                # expects you to send tool info again.
+                print(
+                    f"Tool error: expected {required_tool.name}, got {current_tool.name}."
+                )
+                print(
+                    "Sorry, we don't currently support recovering from this, you'll have to restart the whole cut."
+                )
+                return
+            case (
+                PBInteractionStatus.riMATCUTGettingDevicePressureSettings
+                | PBInteractionStatus.riMATCUTAccessoryChanged
+                | PBInteractionStatus.riDetectingTool
+                | PBInteractionStatus.riMATCUTSetProgress
+                | PBInteractionStatus.riWaitForEndMoveProgress
+            ):
+                pass
+            case _:
+                raise ValueError(f"unexpected status {resp.status}")
 
     print("Cutting finished.")
 

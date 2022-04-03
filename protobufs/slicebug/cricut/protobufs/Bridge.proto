@@ -37,6 +37,7 @@ enum PBInteractionStatus {
   riSendToolArray = 135;
   riToolInfoReceived = 136;
   riDetectingTool = 137;
+  riWaitForEndMoveProgress = 158;
   riMATCUT = 700;
   riMATCUTNeedPathData = 701;
   riMATCUTSetPathData = 703;
