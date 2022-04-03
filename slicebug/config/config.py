@@ -69,3 +69,13 @@ class Config:
             return None
 
         return path
+
+    def path_util_plugin_path(self):
+        path = os.path.join(
+            self.config_root, "plugins", "crigeo-cli", "CricutPathUtil.exe"
+        )
+
+        if not os.path.exists(path):
+            return None
+
+        return path

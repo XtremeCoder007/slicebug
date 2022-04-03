@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+message Command {
+  string id = 1;
+  oneof type {
+    SVGConvertCanvas svgConvertCanvas = 1400;
+  }
+}
+
+message CommandResponse {
+  string id = 1;
+  oneof type {
+    ErrorResponse errorResponse = 10;
+    SVGConvertCanvasResponse svgConvertCanvasResponse = 1400;
+  }
+}
+
+message ErrorResponse {
+  enum GenericErrorCode {
+    UNKNOWN = 0;
+    COMMAND_INVALID = 1;
+  }
+
+  string detail = 2;
+  oneof code {
+    GenericErrorCode genericErrorCode = 10;
+    SVGConvertCanvasResponse.ErrorCode svgConvertCanvasResponseErrorCode = 1400;
+  }
+}
+
+message SVGConvertCanvas {
+  string svg = 1;
+}
+
+message SVGConvertCanvasResponse {
+  enum ErrorCode {
+    UNKNOWN = 0;
+    INVALID_SVG_DATA = 1;
+    NO_GRAPHIC_DATA = 2;
+  }
+
+  string canvas = 1;
+}

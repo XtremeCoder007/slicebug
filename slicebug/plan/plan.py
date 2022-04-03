@@ -20,6 +20,12 @@ class PlanMat:
             height=data["height"],
         )
 
+    def to_json(self):
+        return {
+            "width": self.width,
+            "height": self.height,
+        }
+
 
 @dataclass
 class PlanMaterial:
@@ -37,6 +43,13 @@ class PlanMaterial:
             height=data["height"],
             cricut_api_global_id=data["type"],
         )
+
+    def to_json(self):
+        return {
+            "width": self.width,
+            "height": self.height,
+            "type": self.cricut_api_global_id,
+        }
 
 
 @dataclass
@@ -79,6 +92,15 @@ class PlanPath:
             path=data["path"],
         )
 
+    def to_json(self):
+        result = {
+            "tool": self.tool.name,
+            "path": self.path,
+        }
+        if self.color is not None:
+            result["color"] = self.color
+        return result
+
 
 @dataclass
 class Plan:
@@ -98,3 +120,11 @@ class Plan:
             material=PlanMaterial.from_json(data["material"], version),
             paths=[PlanPath.from_json(path, version) for path in data["paths"]],
         )
+
+    def to_json(self):
+        return {
+            "version": 1,
+            "mat": self.mat.to_json(),
+            "material": self.material.to_json(),
+            "paths": [p.to_json() for p in self.paths],
+        }
