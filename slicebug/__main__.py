@@ -6,7 +6,7 @@ from slicebug.cli.cut import cut_register_args
 from slicebug.cli.list_materials import list_materials_register_args
 from slicebug.cli.list_tools import list_tools_register_args
 from slicebug.config.config import Config
-
+from slicebug.exceptions import UserError
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--profile")
@@ -22,18 +22,29 @@ cut_register_args(subparsers)
 args = parser.parse_args()
 
 if "cmd_handler" not in args:
-    print("oops no command")
+    parser.print_help()
     sys.exit(1)
 
-config_root = os.path.expanduser("~/.slicebug")
-config = Config.load(config_root, args.profile)
+try:
+    config_root = os.path.expanduser("~/.slicebug")
+    config = Config.load(config_root, args.profile)
 
-if args.cmd_needs_profile and config.profile is None:
-    print("need profile! run bootstrap")
+    if args.cmd_needs_profile and config.profile is None:
+        raise UserError(
+            "A machine profile is required to run this command, but it was not found.",
+            "Try running `slicebug bootstrap`.",
+        )
+
+    if args.cmd_needs_keys and config.keys is None:
+        raise UserError(
+            "Keys are required to run this command, but they were not found.",
+            "Try running `slicebug bootstrap`.",
+        )
+
+    args.cmd_handler(args, config)
+except UserError as err:
+    message, resolution = err.args
+    print(f"Error: {message}", file=sys.stderr)
+    if resolution is not None:
+        print(resolution, file=sys.stderr)
     sys.exit(1)
-
-if args.cmd_needs_keys and config.keys is None:
-    print("need keys! run bootstrap")
-    sys.exit(1)
-
-args.cmd_handler(args, config)

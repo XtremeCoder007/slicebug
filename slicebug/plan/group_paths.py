@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+from slicebug.exceptions import UserError
+
 
 def group_and_order_paths(plan):
     paths_by_tool = defaultdict(list)
@@ -15,8 +17,9 @@ def group_and_order_paths(plan):
 
     for (tool, _), (next_tool, _) in zip(paths_grouped, paths_grouped[1:]):
         if tool.cricut_pb_art_type == next_tool.cricut_pb_art_type:
-            raise ValueError(
-                f"tools {tool.name} and {next_tool.name} cannot be used in the same plan"
+            raise UserError(
+                f"Plan uses both {tool.name} and {next_tool.name}. These tools cannot be used in the same plan.",
+                "Modify the plan to avoid using these incompatible tools.",
             )
 
     return paths_grouped

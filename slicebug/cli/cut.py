@@ -17,6 +17,7 @@ from slicebug.cricut.protobufs.Bridge_pb2 import (
     PBMatPathData,
     PBToolInfo,
 )
+from slicebug.exceptions import ProtocolError, UserError
 from slicebug.plan.plan import Plan
 from slicebug.cricut.tools import HeadType, TOOLS_BY_PB_TOOL_TYPE
 from slicebug.plan.group_paths import (
@@ -87,8 +88,9 @@ def cut_inner(config, dev, plan):
     material_settings = MaterialSettings.load(config.profile.material_settings_path())
 
     if plan.material.cricut_api_global_id not in material_settings.materials:
-        raise ValueError(
-            f"material {plan.material.cricut_api_global_id} is not available"
+        raise UserError(
+            f"Material with ID {args.material} does not exist.",
+            "Try `slicebug list-materials` to view a list of supported materials and their IDs, then modify the plan to use a supported material.",
         )
 
     material = material_settings.materials[plan.material.cricut_api_global_id]
@@ -119,8 +121,9 @@ def cut_inner(config, dev, plan):
     serial = machine_summary_resp.device.serial
 
     if serial != config.profile.serial:
-        raise ValueError(
-            f"serial of connected device ({serial}) does not match profile ({config.profile.serial})"
+        raise UserError(
+            f"Serial of connected device ({serial}) does not match profile ({config.profile.serial}).",
+            "Connect the correct device or switch to a different profile with --profile.",
         )
 
     dev.send(
@@ -236,23 +239,21 @@ def cut_inner(config, dev, plan):
                     dev.recv(PBInteractionStatus.riWaitClear)
                     dev.recv(PBInteractionStatus.riDeviceResumed)
                 else:
-                    raise ValueError(f"unexpected status {choice.status}")
+                    raise ProtocolError(
+                        f"unexpected status after pause: {choice.status}"
+                    )
             case PBInteractionStatus.riMATCUTReportTool:
                 current_tool = TOOLS_BY_PB_TOOL_TYPE[resp.accessoryV2.current.toolType]
                 required_tool = TOOLS_BY_PB_TOOL_TYPE[
                     resp.accessoryV2.required.toolType
                 ]
-                # TODO: error
                 # TODO: actually implement this properly. The difficulty is
                 # that the plugin follows this with riSendToolArray and
                 # expects you to send tool info again.
-                print(
-                    f"Tool error: expected {required_tool.name}, got {current_tool.name}."
+                raise UserError(
+                    f"Tool error: expected {required_tool.name}, got {current_tool.name}.",
+                    "Sorry, we don't currently support recovering from this, you'll have to restart the whole cut.",
                 )
-                print(
-                    "Sorry, we don't currently support recovering from this, you'll have to restart the whole cut."
-                )
-                return
             case (
                 PBInteractionStatus.riMATCUTGettingDevicePressureSettings
                 | PBInteractionStatus.riMATCUTAccessoryChanged
@@ -262,7 +263,7 @@ def cut_inner(config, dev, plan):
             ):
                 pass
             case _:
-                raise ValueError(f"unexpected status {resp.status}")
+                raise ProtocolError(f"unexpected status in cut loop: {resp.status}")
 
     print("Cutting finished.")
 
@@ -280,8 +281,9 @@ def cut_inner(config, dev, plan):
 
 def cut(args, config):
     if config.device_plugin_path() is None:
-        print("need device plugin! run bootstrap")
-        return
+        raise UserError(
+            "Device plugin is missing.", "Try running `slicebug bootstrap`."
+        )
 
     plan = Plan.from_json(json.load(args.plan))
 

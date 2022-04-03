@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from slicebug.cricut.material_settings import MaterialSettings
 from slicebug.cricut.tools import TOOLS
+from slicebug.exceptions import UserError
 
 
 def list_tools_register_args(subparsers):
@@ -18,8 +19,10 @@ def list_tools(args, config):
     materials = material_settings.materials
 
     if args.material not in materials:
-        print(f"Material {args.material} not found!")
-        return
+        raise UserError(
+            f"Material with ID {args.material} does not exist.",
+            "Try `slicebug list-materials` to view a list of supported materials and their IDs.",
+        )
 
     material = materials[args.material]
 

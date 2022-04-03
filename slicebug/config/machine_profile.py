@@ -2,6 +2,8 @@ import json
 import os.path
 from dataclasses import dataclass
 
+from slicebug.exceptions import UserError
+
 
 @dataclass
 class MachineProfile:
@@ -11,7 +13,10 @@ class MachineProfile:
     @classmethod
     def from_json(cls, serialized, version, config_root):
         if version != 1:
-            raise ValueError(f"wrong profile version {version}")
+            raise UserError(
+                f"Wrong machine profile version {version}.",
+                "Your profile might be corrupted. Try running `slicebug bootstrap` again.",
+            )
 
         serial = serialized["serial"]
         profile_root = os.path.join(config_root, "profiles", serial)
@@ -42,7 +47,10 @@ class MachineProfiles:
             saved = json.load(profiles_file)
 
         if (version := saved.get("version")) != 1:
-            raise ValueError(f"wrong profiles.json version {version}")
+            raise UserError(
+                f"Wrong profiles.json version {version}",
+                "Your profile might be corrupted. Try running `slicebug bootstrap` again.",
+            )
 
         return cls(
             profiles={

@@ -2,6 +2,8 @@ import json
 import os.path
 from dataclasses import dataclass
 
+from slicebug.exceptions import UserError
+
 
 @dataclass
 class Keys:
@@ -18,7 +20,10 @@ class Keys:
             saved = json.load(config_file)
 
         if (version := saved.get("version")) != 1:
-            raise ValueError(f"wrong keys.json version {version}")
+            raise UserError(
+                f"Wrong keys.json version {version}.",
+                "Your profile might be corrupted. Try running `slicebug bootstrap` again.",
+            )
 
         return cls(
             settings8_raw=saved["settings8_raw"],

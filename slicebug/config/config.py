@@ -5,6 +5,7 @@ from typing import Optional
 
 from slicebug.config.keys import Keys
 from slicebug.config.machine_profile import MachineProfiles, MachineProfile
+from slicebug.exceptions import UserError
 
 
 @dataclass
@@ -41,7 +42,7 @@ class Config:
         ):
             profile = profiles.profiles[profile_name]
         elif profile_requested:
-            raise ValueError(f"profile {profile_name} does not exist")
+            raise UserError(f"Profile {profile_name} does not exist.")
 
         return cls(
             config_root=config_root,

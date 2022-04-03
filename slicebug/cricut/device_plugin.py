@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives.ciphers.modes import ECB
 
 from slicebug.cricut.base_plugin import BasePlugin
 from slicebug.cricut.protobufs.Bridge_pb2 import PBCommonBridge
+from slicebug.exceptions import ProtocolError
 
 
 class DevicePlugin(BasePlugin):
@@ -29,8 +30,7 @@ class DevicePlugin(BasePlugin):
         message = self._recv()
 
         if (expect is not None) and (message.status != expect):
-            # TODO: exception type
-            raise ValueError(
+            raise ProtocolError(
                 f"incorrect message status: expected {expect}, got {message.status}"
             )
 
