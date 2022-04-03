@@ -98,7 +98,6 @@ class MaterialSettings:
 
     @classmethod
     def load(cls, path):
-        # TODO: encoding?
         with open(path, encoding="utf-8") as ms_file:
             materials_json = json.load(ms_file)["customMaterials"]["materials"]
             materials = {
