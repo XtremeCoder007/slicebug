@@ -206,8 +206,6 @@ def cut_inner(config, dev, plan):
     dev.recv(PBInteractionStatus.riMATCUTProcessingPathData)
     dev.recv(PBInteractionStatus.riMATCUTProcessingPathDataComplete)
 
-    # TODO: tool swapping
-    # TODO: pausing
     # TODO: wrong tool
     while (resp := dev.recv()).status != PBInteractionStatus.riMATCUTCompleteSuccess:
         # this will spam a bunch of riMATCUTGettingDevicePressureSettings for some reason,
@@ -221,6 +219,20 @@ def cut_inner(config, dev, plan):
                 print(
                     f"Replace the {current_tool.name} with {required_tool.name} and press Go."
                 )
+            case PBInteractionStatus.riDevicePaused:
+                dev.recv(PBInteractionStatus.riWaitOnGoOrPause)
+                print("Cutting paused. Press Go to resume or Load/Unload to abort cut.")
+
+                choice = dev.recv()
+                if choice.status == PBInteractionStatus.riMatUnloaded:
+                    print("Cutting aborted.")
+                    return
+                elif choice.status == PBInteractionStatus.riPausePressed:
+                    print("Cutting resumed.")
+                    dev.recv(PBInteractionStatus.riWaitClear)
+                    dev.recv(PBInteractionStatus.riDeviceResumed)
+                else:
+                    raise ValueError(f"unexpected status {choice.status}")
 
     print("Cutting finished.")
 
