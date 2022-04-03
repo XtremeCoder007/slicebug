@@ -65,7 +65,6 @@ def plan_mat_path_data(config, plan, grouped_paths):
                 fiducialId=-1,
                 pathData=path.path,
                 actualPathType=tool.cricut_pb_art_type,
-                contourActiveFlags=[1],  # TODO: do we need this?
             )
 
             if path.color is not None:
