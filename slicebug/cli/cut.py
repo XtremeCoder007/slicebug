@@ -187,13 +187,16 @@ def cut_inner(config, dev, plan):
     print()
 
     resp = dev.recv()
-    if resp.status == PBInteractionStatus.riWaitOnMatLoad:
-        print("Insert mat and press the Load/Unload button.")
-        dev.recv(PBInteractionStatus.riMatLoaded)
-    elif resp.status == PBInteractionStatus.riMatLoaded:
-        print("Mat is already loaded.")
-    else:
-        assert False  # TODO: exception type
+    match resp.status:
+        case PBInteractionStatus.riWaitOnMatLoad:
+            print("Insert mat and press the Load/Unload button.")
+            dev.recv(PBInteractionStatus.riMatLoaded)
+        case PBInteractionStatus.riMatLoaded:
+            print("Mat is already loaded.")
+        case _:
+            raise ProtocolError(
+                f"unexpected status after material selected: {resp.status}"
+            )
 
     dev.recv(PBInteractionStatus.riWaitClear)
 
