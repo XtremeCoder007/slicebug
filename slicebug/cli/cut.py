@@ -104,8 +104,25 @@ def cut_inner(config, dev, plan):
 
     dev.recv(PBInteractionStatus.riStartSuccess)
 
-    # TODO: handle riNoDeviceConnected, riMultipleDevicesConnected
-    device_connected_resp = dev.recv(PBInteractionStatus.riSingleDeviceConnected)
+    device_connected_resp = dev.recv()
+    match device_connected_resp.status:
+        case PBInteractionStatus.riSingleDeviceConnected:
+            # great, this is what we're looking for
+            pass
+        case PBInteractionStatus.riNoDeviceConnected:
+            raise UserError(
+                "No Cricut devices connected.",
+                "Connect your cutter to your computer and try again.",
+            )
+        case PBInteractionStatus.riMultipleDevicesConnected:
+            raise UserError(
+                "Multiple Cricut devices connected.",
+                "Disconnect all cutters except for the one you are trying to use and try again.",
+            )
+        case _:
+            raise ProtocolError(
+                f"unexpected status after start success: {device_connected_resp.status}"
+            )
 
     dev.send(
         PBCommonBridge(
