@@ -1,6 +1,7 @@
 import argparse
 import os.path
 import sys
+import traceback
 
 from slicebug.cli.cut import cut_register_args
 from slicebug.cli.list_materials import list_materials_register_args
@@ -48,3 +49,16 @@ except UserError as err:
     if resolution is not None:
         print(resolution, file=sys.stderr)
     sys.exit(1)
+except Exception as err:
+    traceback.print_exception(err)
+    print("", file=sys.stderr)
+    print("An unexpected error has occurred!", file=sys.stderr)
+    print(
+        "This might be a bug in slicebug or unexpected Cricut behavior.",
+        file=sys.stderr,
+    )
+    print(
+        "Try again. If the error persists, send a copy or screenshot of this "
+        "error message (including the details above) to slicebug developers.",
+        file=sys.stderr,
+    )
