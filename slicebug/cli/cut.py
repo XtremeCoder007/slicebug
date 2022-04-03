@@ -104,6 +104,7 @@ def cut_inner(config, dev, plan):
 
     dev.recv(PBInteractionStatus.riStartSuccess)
 
+    # TODO: handle riNoDeviceConnected, riMultipleDevicesConnected
     device_connected_resp = dev.recv(PBInteractionStatus.riSingleDeviceConnected)
 
     dev.send(
