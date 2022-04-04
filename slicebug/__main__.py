@@ -10,9 +10,10 @@ from slicebug.cli.list_tools import list_tools_register_args
 from slicebug.cli.plan import plan_register_args
 from slicebug.config.config import Config
 from slicebug.exceptions import UserError
+from slicebug.version import VERSION
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--version", action="version", version="TODO")
+parser.add_argument("--version", action="version", version=VERSION)
 parser.add_argument("--profile", help="pick a machine profile to use")
 
 subparsers = parser.add_subparsers()

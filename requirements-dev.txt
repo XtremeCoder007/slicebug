@@ -1,0 +1,11 @@
+black==22.1.0
+cffi==1.15.0
+click==8.0.4
+cryptography==36.0.2
+cx-Freeze==6.10
+mypy-extensions==0.4.3
+pathspec==0.9.0
+platformdirs==2.5.1
+protobuf==3.19.4
+pycparser==2.21
+tomli==2.0.1
