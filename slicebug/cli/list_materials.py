@@ -4,7 +4,9 @@ from slicebug.cricut.material_settings import MaterialSettings
 
 
 def list_materials_register_args(subparsers):
-    parser = subparsers.add_parser("list-materials")
+    parser = subparsers.add_parser(
+        "list-materials", help="List materials that can be cut and their IDs."
+    )
 
     parser.set_defaults(cmd_handler=list_materials)
     parser.set_defaults(cmd_needs_profile=True)

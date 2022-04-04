@@ -45,15 +45,40 @@ def parse_color_tool_mapping(string):
 
 
 def plan_register_args(subparsers):
-    parser = subparsers.add_parser("plan")
-    parser.add_argument("input_file", type=argparse.FileType("r"))
-    parser.add_argument("output_file", type=argparse.FileType("w"))
+    parser = subparsers.add_parser("plan", help="Convert an SVG drawing to a cut plan.")
     parser.add_argument(
-        "--map", action="append", default=[], type=parse_color_tool_mapping
+        "input_file", type=argparse.FileType("r"), help="Path to the SVG file."
     )
-    parser.add_argument("--material", type=int, required=True)
-    parser.add_argument("--material-size", default=(12.0, 12.0), type=parse_dimensions)
-    parser.add_argument("--mat-size", default=(13.0, 12.0), type=parse_dimensions)
+    parser.add_argument(
+        "output_file",
+        type=argparse.FileType("w"),
+        help="Path where the plan will be saved.",
+    )
+    parser.add_argument(
+        "--map",
+        action="append",
+        default=[],
+        type=parse_color_tool_mapping,
+        help="Map a stroke color to a cutting tool. For example, 000000:fine_point_knife will cut along black lines, while ff0000:pen will draw along red lines.",
+    )
+    parser.add_argument(
+        "--material",
+        type=int,
+        required=True,
+        help="ID of the material being cut (see list-materials).",
+    )
+    parser.add_argument(
+        "--material-size",
+        default=(12.0, 12.0),
+        type=parse_dimensions,
+        help="Dimensions of the material being cut, in WxH format, in inches. Defaults to 12x12.",
+    )
+    parser.add_argument(
+        "--mat-size",
+        default=(13.0, 12.0),
+        type=parse_dimensions,
+        help="Dimensions of the mat, in WxH format, in inches. Defaults to 13x12.",
+    )
 
     parser.set_defaults(cmd_handler=plan)
     parser.set_defaults(cmd_needs_profile=True)

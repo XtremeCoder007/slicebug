@@ -28,8 +28,10 @@ from slicebug.plan.group_paths import (
 
 
 def cut_register_args(subparsers):
-    parser = subparsers.add_parser("cut")
-    parser.add_argument("plan", type=argparse.FileType("r"))
+    parser = subparsers.add_parser("cut", help="Execute a planned cut.")
+    parser.add_argument(
+        "plan", type=argparse.FileType("r"), help="Path to your plan file."
+    )
 
     parser.set_defaults(cmd_handler=cut)
     parser.set_defaults(cmd_needs_profile=True)

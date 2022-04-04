@@ -12,15 +12,16 @@ from slicebug.config.config import Config
 from slicebug.exceptions import UserError
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--profile")
+parser.add_argument("--version", action="version", version="TODO")
+parser.add_argument("--profile", help="pick a machine profile to use")
 
 subparsers = parser.add_subparsers()
 
+bootstrap_register_args(subparsers)
 list_materials_register_args(subparsers)
 list_tools_register_args(subparsers)
-cut_register_args(subparsers)
 plan_register_args(subparsers)
-bootstrap_register_args(subparsers)
+cut_register_args(subparsers)
 
 args = parser.parse_args()
 

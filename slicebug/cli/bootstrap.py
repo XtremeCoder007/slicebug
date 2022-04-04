@@ -12,13 +12,18 @@ from slicebug.exceptions import UserError
 
 
 def bootstrap_register_args(subparsers):
-    parser = subparsers.add_parser("bootstrap")
+    parser = subparsers.add_parser(
+        "bootstrap",
+        help="Prepare slicebug for use by copying required information from Cricut Design Space.",
+    )
     parser.add_argument(
         "--design-space-path",
+        help="Path to where Cricut Design Space is installed. Defaults to %(default)s, you likely don't need to change this.",
         default=os.path.expanduser("~/AppData/Local/Programs/Cricut Design Space"),
     )
     parser.add_argument(
         "--design-space-profile-path",
+        help="Path to where Cricut Design Space stores your user data. Defaults to %(default)s, you likely don't need to change this.",
         default=os.path.expanduser("~/.cricut-design-space"),
     )
 

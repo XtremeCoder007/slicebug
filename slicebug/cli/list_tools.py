@@ -6,8 +6,14 @@ from slicebug.exceptions import UserError
 
 
 def list_tools_register_args(subparsers):
-    parser = subparsers.add_parser("list-tools")
-    parser.add_argument("material", type=int)
+    parser = subparsers.add_parser(
+        "list-tools", help="List tools that can be used with a given material."
+    )
+    parser.add_argument(
+        "material",
+        type=int,
+        help="Material ID (e.g. 218 for light cardstock, see list-materials).",
+    )
 
     parser.set_defaults(cmd_handler=list_tools)
     parser.set_defaults(cmd_needs_profile=True)
