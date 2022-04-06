@@ -27,6 +27,9 @@ enum PBInteractionStatus {
   riWaitOnGoOrPause = 116;
   riGoPressed = 117;
   riPausePressed = 118;
+  riFiducialSearching = 119;
+  riFiducialFound = 120;
+  riFiducialNotFound = 121;
   riDevicePaused = 122;
   riDeviceResumed = 123;
   riWaitClear = 124;
@@ -38,6 +41,9 @@ enum PBInteractionStatus {
   riToolInfoReceived = 136;
   riDetectingTool = 137;
   riWaitForEndMoveProgress = 158;
+  riFiducialEdgeScanning = 162;
+  riFiducialEdgeScanned = 163;
+  riFiducialEdgeScanningFailed = 164;
   riMATCUT = 700;
   riMATCUTNeedPathData = 701;
   riMATCUTSetPathData = 703;
@@ -97,6 +103,15 @@ message PBBridgeSelectedTools {
   repeated PBToolInfo tools = 4;
 }
 
+message PBMatFiducialData {
+  int32 fiducialId = 1;
+  PBPoint location = 2;
+  PBSize imageSize = 3;
+  PBSize fiducialSize = 4;
+  double lineWidth = 5;
+  double fiducialPadding = 6;
+}
+
 message PBMatPathData {
   int32 fiducialId = 1;
   string pathData = 2;
@@ -106,6 +121,8 @@ message PBMatPathData {
 
   repeated PBMatPathData imageData = 10;
   PBSize materialSize = 11;
+
+  repeated PBMatFiducialData fiducialData = 12;
 }
 
 message PBMaterialSelected {

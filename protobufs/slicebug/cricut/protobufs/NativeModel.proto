@@ -156,3 +156,8 @@ enum PBHeadType {
   CLAMP_B_HT = 1;
   UNKNOWN_HT = 2;
 }
+
+message PBPoint {
+  double x = 1;
+  double y = 2;
+}
