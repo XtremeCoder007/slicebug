@@ -89,7 +89,7 @@ def cut_inner(config, dev, plan):
 
     if plan.material.cricut_api_global_id not in material_settings.materials:
         raise UserError(
-            f"Material with ID {args.material} does not exist.",
+            f"Material with ID {plan.material.cricut_api_global_id} does not exist.",
             "Try `slicebug list-materials` to view a list of supported materials and their IDs, then modify the plan to use a supported material.",
         )
 
