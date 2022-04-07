@@ -52,6 +52,14 @@ class Config:
             profile=profile,
         )
 
+    def create_dirs(self):
+        os.makedirs(self.config_root, exist_ok=True)
+        os.makedirs(self.plugin_root(), exist_ok=True)
+        os.makedirs(MachineProfiles.profiles_root(self.config_root), exist_ok=True)
+
+    def plugin_root(self):
+        return os.path.join(self.config_root, "plugins")
+
     def device_plugin_path(self):
         path = os.path.join(
             self.config_root, "plugins", "device-common", "CricutDevice.exe"

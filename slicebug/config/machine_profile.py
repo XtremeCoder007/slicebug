@@ -11,7 +11,7 @@ class MachineProfile:
     profile_root: str
 
     @classmethod
-    def from_json(cls, serialized, version, config_root):
+    def from_json(cls, serialized, version, profiles_root):
         if version != 1:
             raise UserError(
                 f"Wrong machine profile version {version}.",
@@ -19,7 +19,7 @@ class MachineProfile:
             )
 
         serial = serialized["serial"]
-        profile_root = os.path.join(config_root, "profiles", serial)
+        profile_root = os.path.join(profiles_root, serial)
 
         return cls(
             serial=serial,
@@ -36,6 +36,10 @@ class MachineProfile:
 @dataclass
 class MachineProfiles:
     profiles: dict[str, MachineProfile]
+
+    @classmethod
+    def profiles_root(cls, config_root):
+        return os.path.join(config_root, "profiles")
 
     @classmethod
     def load(cls, config_root):
@@ -55,7 +59,7 @@ class MachineProfiles:
         return cls(
             profiles={
                 profile_name: MachineProfile.from_json(
-                    profile_json, version, config_root
+                    profile_json, version, cls.profiles_root(config_root)
                 )
                 for profile_name, profile_json in saved["profiles"].items()
             }

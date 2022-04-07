@@ -3,6 +3,7 @@ import os.path
 import sys
 import traceback
 
+from slicebug.cli.bootstrap import bootstrap_register_args
 from slicebug.cli.cut import cut_register_args
 from slicebug.cli.list_materials import list_materials_register_args
 from slicebug.cli.list_tools import list_tools_register_args
@@ -18,7 +19,7 @@ list_materials_register_args(subparsers)
 list_tools_register_args(subparsers)
 cut_register_args(subparsers)
 # plan_register_args(subparsers)
-# bootstrap_register_args(subparsers)
+bootstrap_register_args(subparsers)
 
 args = parser.parse_args()
 
