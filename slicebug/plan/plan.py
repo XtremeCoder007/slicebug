@@ -67,6 +67,12 @@ class PlanPath:
                 "Modify your plan to avoid setting a color for tools other than the pen.",
             )
 
+        if (color is None) and (tool.name == "pen"):
+            raise UserError(
+                f"A pen path does not have a color set.",
+                "Modify your plan to set a color for all pen paths.",
+            )
+
         return cls(
             tool=TOOLS_BY_NAME[tool_name],
             color=data.get("color"),
