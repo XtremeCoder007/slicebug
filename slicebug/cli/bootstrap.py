@@ -1,14 +1,25 @@
 import base64
 import hashlib
+import io
 import json
 import os.path
 import re
 import shutil
+import urllib.request
+import zipfile
 from collections import defaultdict
 
 from slicebug.config.keys import Keys
 from slicebug.config.machine_profile import MachineProfile, MachineProfiles
 from slicebug.exceptions import UserError
+
+
+USVG_DOWNLOAD_URL = (
+    "https://github.com/RazrFalcon/resvg/releases/download/v0.27.0/usvg-win64.zip"
+)
+USVG_DOWNLOAD_SHA256 = (
+    "fc30023106bc846ba43713a620b638a04cae761a9fa899b7bd31f4ef9236b96d"
+)
 
 
 def bootstrap_register_args(subparsers):
@@ -163,6 +174,25 @@ def import_machine_profiles(cds_profile_root, cds_users, config):
     print("Machines imported.")
 
 
+def download_usvg(config):
+    print("Downloading usvg from Github.")
+    response = urllib.request.urlopen(USVG_DOWNLOAD_URL)
+    zip_bytes = response.read()
+    zip_sha256 = hashlib.sha256(zip_bytes).hexdigest()
+
+    if zip_sha256 != USVG_DOWNLOAD_SHA256:
+        raise UserError(
+            "Could not download usvg. Expected to see a file with hash {USVG_DOWNLOAD_SHA256}, saw {zip_sha256}.",
+            "Check your network connection.",
+        )
+
+    print("Extracting usvg.")
+    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zip_struct:
+        zip_struct.extract("usvg.exe", os.path.join(config.plugin_root(), "usvg"))
+
+    print("usvg extracted.")
+
+
 def bootstrap(args, config):
     config.create_dirs()
 
@@ -198,3 +228,4 @@ def bootstrap(args, config):
         args.design_space_path, args.design_space_profile_path, cds_users[0], config
     )
     import_machine_profiles(args.design_space_profile_path, cds_users, config)
+    download_usvg(config)

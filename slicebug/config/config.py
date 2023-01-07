@@ -1,4 +1,5 @@
 import os.path
+import shutil
 
 from dataclasses import dataclass
 from typing import Optional
@@ -77,5 +78,15 @@ class Config:
 
         if not os.path.exists(path):
             return None
+
+        return path
+
+    def usvg_path(self):
+        path = os.path.join(self.config_root, "plugins", "usvg", "usvg.exe")
+
+        if not os.path.exists(path):
+            path = shutil.which("usvg")
+            if path is None:
+                return None
 
         return path
