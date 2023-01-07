@@ -6,9 +6,22 @@ from slicebug.exceptions import UserError
 
 
 @dataclass
+class CalibrationRecord:
+    tool_name: str
+    x: float
+    y: float
+
+    @classmethod
+    def from_json(cls, serialized, version):
+        assert version == 1
+        return cls(serialized["tool"], serialized["x"], serialized["y"])
+
+
+@dataclass
 class MachineProfile:
     serial: str
     profile_root: str
+    calibration_records: list[CalibrationRecord]
 
     @classmethod
     def from_json(cls, serialized, version, profiles_root):
@@ -20,11 +33,22 @@ class MachineProfile:
 
         serial = serialized["serial"]
         profile_root = os.path.join(profiles_root, serial)
+        calibration_records = [
+            CalibrationRecord.from_json(x, version)
+            for x in serialized.get("calibration", [])
+        ]
 
         return cls(
             serial=serial,
             profile_root=profile_root,
+            calibration_records=calibration_records,
         )
+
+    def calibration_for_tool(self, tool):
+        for record in self.calibration_records:
+            if record.tool_name == tool.name:
+                return record
+        return CalibrationRecord(tool.name, 0, 0)
 
     def to_json(self):
         return {"serial": self.serial}

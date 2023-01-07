@@ -59,14 +59,41 @@ def plan_tool_info(config, material, grouped_paths):
     return selected_tools
 
 
+def path_apply_calibration(path_data, calibration):
+    tokens_in = path_data.split()[::-1]
+    tokens_out = []
+    while tokens_in:
+        match t := tokens_in.pop():
+            case ("M" | "L" | "Z" | "C"):
+                tokens_out.append(t)
+                param_count = {"M": 1, "L": 1, "Z": 0, "C": 3}
+                for _ in range(param_count[t]):
+                    tokens_out.append(str(float(t) + calibration.x))
+                    tokens_out.append(str(float(tokens_in.pop()) + calibration.y))
+            case "H":
+                tokens_out.append(t)
+                tokens_out.append(str(float(tokens_in.pop()) + calibration.x))
+            case "V":
+                tokens_out.append(t)
+                tokens_out.append(str(float(tokens_in.pop()) + calibration.y))
+            case _:
+                raise UserError(f"Unexpected token {t!r} in path.", "Check the plan.")
+
+    return " ".join(tokens_out)
+
+
 def plan_mat_path_data(config, plan, grouped_paths):
     paths = []
 
     for tool, tool_paths in grouped_paths:
+        calibration = config.profile.calibration_for_tool(tool)
+
         for path in tool_paths:
+            path_data = path_apply_calibration(path.path, calibration)
+
             path_pb = PBMatPathData(
                 fiducialId=-1,
-                pathData=path.path,
+                pathData=path_data,
                 actualPathType=tool.cricut_pb_art_type,
             )
 
