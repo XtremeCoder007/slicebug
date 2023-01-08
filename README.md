@@ -80,8 +80,12 @@ Just follow the instructions and your cut should complete!
 # Things that don't work yet
 
 - Testing/support for anything other than the original Cricut Maker
-- macOS support
-	- This should be fairly easy, just some hardcoded paths that might need tweaking.
-- Linux support
-	- CricutDevice.exe does not run under Wine, but perhaps it does under one of the forks? Or maybe we can proxy requests into a Windows VM?
+  - Basic cutting will likely work on other machines supported by Cricut Design Space---please try it and report back!
+  - Features specific to other machines, like Smart Materials, are not supported yet.
+- Operating systems other than Windows
+  - macOS: should be fairly easy, just some hardcoded paths that need tweaking.
+  - Linux: 
+  	- CricutDevice.exe does not run under Wine, but perhaps it does under one of the forks?
+    - `slicebug plan` works under Linux already if you copy the bootstrapped files from a Windows machine and manually install usvg.
 - Print then Cut
+  - Should be doable.
