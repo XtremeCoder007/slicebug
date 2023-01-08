@@ -200,6 +200,10 @@ def parse_simplified_svg(tree):
                 paths_without_stroke += 1
                 return
 
+            # TODO: warn about paths that are partially or fully outside of
+            # the viewbox, as that will cause the machine to behave
+            # erratically.
+
             path_data = element.attrib["d"]
             path_steps = PlanPathStep.many_from_svg(path_data)
             for step in path_steps:
