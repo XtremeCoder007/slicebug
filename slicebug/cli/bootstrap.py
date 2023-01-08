@@ -92,7 +92,7 @@ def import_plugins(cds_root, config):
     plugin_dir = os.path.join(cds_root, "resources", "plugins")
     print(f"Importing plugins from {cds_root}.")
 
-    for plugin in ["device-common", "crigeo-cli"]:
+    for plugin in ["device-common"]:
         print(f"Importing plugin {plugin}.")
         shutil.copytree(
             os.path.join(plugin_dir, plugin),
