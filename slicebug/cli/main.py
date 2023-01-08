@@ -66,3 +66,4 @@ except Exception as err:
         "error message (including the details above) to slicebug developers.",
         file=sys.stderr,
     )
+    sys.exit(1)
