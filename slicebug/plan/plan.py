@@ -1,8 +1,11 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
 
 from slicebug.cricut.tools import Tool, TOOLS_BY_NAME
 from slicebug.exceptions import UserError
+
+PLAN_DPI = 72
 
 
 @dataclass
@@ -14,7 +17,7 @@ class PlanMat:
 
     @classmethod
     def from_json(cls, data, version):
-        assert version == 1
+        assert version == 2
         return cls(
             width=data["width"],
             height=data["height"],
@@ -37,7 +40,7 @@ class PlanMaterial:
 
     @classmethod
     def from_json(cls, data, version):
-        assert version == 1
+        assert version == 2
         return cls(
             width=data["width"],
             height=data["height"],
@@ -52,17 +55,81 @@ class PlanMaterial:
         }
 
 
+class PlanPathOp(Enum):
+    MOVE_TO = "M"
+    LINE_TO = "L"
+    CURVE_TO = "C"
+    CLOSE_PATH = "Z"
+
+    def point_count(self):
+        match self:
+            case (PlanPathOp.MOVE_TO | PlanPathOp.LINE_TO):
+                return 1
+            case PlanPathOp.CURVE_TO:
+                return 3
+            case PlanPathOp.CLOSE_PATH:
+                return 0
+            case _:
+                assert False
+
+
+@dataclass
+class PlanPathStep:
+    """A single step in a plan."""
+
+    op: str
+    points: list[tuple[float, float]]
+
+    @classmethod
+    def from_json(cls, data, version):
+        assert version == 2
+
+        op = PlanPathOp(data["op"])
+        points = [(x, y) for x, y in data["points"]]
+
+        return PlanPathStep(op, points)
+
+    @classmethod
+    def many_from_svg(cls, path_data):
+        tokens = path_data.split()[::-1]
+        steps = []
+        while tokens:
+            op_code = tokens.pop()
+            op = PlanPathOp(op_code)
+            points = []
+            for _ in range(op.point_count()):
+                x = float(tokens.pop())
+                y = float(tokens.pop())
+                points.append((x, y))
+            steps.append(cls(op, points))
+
+        return steps
+
+    def to_svg(self):
+        if not self.points:
+            return self.op.value
+
+        points_formatted = " ".join(f"{x} {y}" for x, y in self.points)
+        return f"{self.op.value} {points_formatted}"
+
+    def to_json(self):
+        return {
+            "op": self.op.value,
+            "points": self.points,
+        }
+
+
 @dataclass
 class PlanPath:
     """An SVG path at 72 DPI."""
 
     tool: Tool
     color: Optional[str]
-    path: str
+    steps: list[PlanPathStep]
 
     @classmethod
     def from_json(cls, data, version):
-        assert version == 1
+        assert version == 2
 
         tool_name = data["tool"]
         if tool_name not in TOOLS_BY_NAME:
@@ -87,15 +154,15 @@ class PlanPath:
             )
 
         return cls(
-            tool=TOOLS_BY_NAME[tool_name],
-            color=data.get("color"),
-            path=data["path"],
+            tool=tool,
+            color=color,
+            steps=[PlanPathStep.from_json(step, version) for step in data["steps"]],
         )
 
     def to_json(self):
         result = {
             "tool": self.tool.name,
-            "path": self.path,
+            "steps": [step.to_json() for step in self.steps],
         }
         if self.color is not None:
             result["color"] = self.color
@@ -110,7 +177,7 @@ class Plan:
 
     @classmethod
     def from_json(cls, data):
-        if (version := data["version"]) != 1:
+        if (version := data["version"]) != 2:
             raise UserError(
                 f"Invalid plan version {version}. The plan might be corrupted, or it might be meant for a different version of slicebug."
             )
@@ -123,7 +190,7 @@ class Plan:
 
     def to_json(self):
         return {
-            "version": 1,
+            "version": 2,
             "mat": self.mat.to_json(),
             "material": self.material.to_json(),
             "paths": [p.to_json() for p in self.paths],

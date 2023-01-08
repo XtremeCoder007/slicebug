@@ -18,7 +18,7 @@ from slicebug.cricut.protobufs.Bridge_pb2 import (
     PBToolInfo,
 )
 from slicebug.exceptions import ProtocolError, UserError
-from slicebug.plan.plan import Plan
+from slicebug.plan.plan import Plan, PlanPathStep
 from slicebug.cricut.tools import HeadType, TOOLS_BY_PB_TOOL_TYPE
 from slicebug.plan.group_paths import (
     first_pen_path_in_group,
@@ -59,27 +59,10 @@ def plan_tool_info(config, material, grouped_paths):
     return selected_tools
 
 
-def path_apply_calibration(path_data, calibration):
-    tokens_in = path_data.split()[::-1]
-    tokens_out = []
-    while tokens_in:
-        match t := tokens_in.pop():
-            case ("M" | "L" | "Z" | "C"):
-                tokens_out.append(t)
-                param_count = {"M": 1, "L": 1, "Z": 0, "C": 3}
-                for _ in range(param_count[t]):
-                    tokens_out.append(str(float(t) + calibration.x))
-                    tokens_out.append(str(float(tokens_in.pop()) + calibration.y))
-            case "H":
-                tokens_out.append(t)
-                tokens_out.append(str(float(tokens_in.pop()) + calibration.x))
-            case "V":
-                tokens_out.append(t)
-                tokens_out.append(str(float(tokens_in.pop()) + calibration.y))
-            case _:
-                raise UserError(f"Unexpected token {t!r} in path.", "Check the plan.")
-
-    return " ".join(tokens_out)
+def step_apply_calibration(step, calibration):
+    return PlanPathStep(
+        step.op, [(x + calibration.x, y + calibration.y) for x, y in step.points]
+    )
 
 
 def plan_mat_path_data(config, plan, grouped_paths):
@@ -89,7 +72,11 @@ def plan_mat_path_data(config, plan, grouped_paths):
         calibration = config.profile.calibration_for_tool(tool)
 
         for path in tool_paths:
-            path_data = path_apply_calibration(path.path, calibration)
+            calibrated_steps = []
+            for step in path.steps:
+                calibrated_steps.append(step_apply_calibration(step, calibration))
+
+            path_data = " ".join(step.to_svg() for step in calibrated_steps)
 
             path_pb = PBMatPathData(
                 fiducialId=-1,
