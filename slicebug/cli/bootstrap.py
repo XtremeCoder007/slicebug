@@ -161,7 +161,9 @@ def import_machine_profiles(cds_profile_root, cds_users, config):
         profile_root = os.path.join(profiles_root, serial)
         os.makedirs(profile_root, exist_ok=True)
 
-        profile = MachineProfile(serial=serial, profile_root=profile_root)
+        profile = MachineProfile(
+            serial=serial, profile_root=profile_root, calibration_records=[]
+        )
 
         shutil.copyfile(
             os.path.join(path, "MaterialSettings"),
@@ -172,6 +174,7 @@ def import_machine_profiles(cds_profile_root, cds_users, config):
 
     machine_profiles.save(config.config_root)
     print("Machines imported.")
+    print()
 
 
 def download_usvg(config):
