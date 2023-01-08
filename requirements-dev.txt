@@ -2,8 +2,10 @@ black==22.1.0
 cffi==1.15.0
 click==8.0.4
 cryptography==36.0.2
-cx-Freeze==6.10
+cx-Freeze==6.13.1
 mypy-extensions==0.4.3
+packaging==22.0
+patchelf==0.14.5.0
 pathspec==0.9.0
 platformdirs==2.5.1
 protobuf==3.19.4

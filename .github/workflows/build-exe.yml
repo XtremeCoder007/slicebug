@@ -17,7 +17,7 @@ jobs:
       - name: Install dependencies
         run: "pip install -r requirements-dev.txt"
       - name: Build
-        run: "python build.py build_exe -b slicebug-release"
+        run: "python setup.py build_exe -b slicebug-release"
       - name: Zip release
         uses: thedoctor0/zip-release@master
         with:

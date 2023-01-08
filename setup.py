@@ -7,6 +7,11 @@ setup(
     version=VERSION,
     description="A CLI for controlling Cricut cutters.",
     executables=[Executable("slicebug/__main__.py", target_name="slicebug")],
+    entry_points={
+        "console_scripts": [
+            "slicebug = slicebug.cli.main:cli",
+        ]
+    },
     options={
         "build_exe": {
             "excludes": ["tkinter"],
